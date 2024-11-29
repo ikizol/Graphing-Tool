@@ -1,0 +1,16 @@
+body {
+    background-color: #614638;
+    font-family: 'Courier New', monospace;
+    color: white;
+}
+
+h1 {
+    text-align: center;
+}
+#graph-container {
+    text-align: center; /* Align form content */
+}
+label, input {
+    /* display: block; */
+    margin: 5px 0;
+}

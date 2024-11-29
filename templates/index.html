@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Multi-Line Graphing Calculator</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <h1 text-align="center">Graphing Tool</h1>
+    <form id="graph-container">
+        <label for="equations">Enter functions of x (comma-separated):</label><br>
+        <input type="text" id="equations" placeholder="e.g., x**2, x**3, x**4"><br><br>
+        <label for="x_min">x Min:</label>
+        <input type="number" id="x_min" value="-10"><br><br>
+        <label for="x_max">x Max:</label>
+        <input type="number" id="x_max" value="10"><br><br>
+    </form>
+    <div id="graph"></div>
+
+    <script>
+        function updateGraph() {
+            const equations = $("#equations").val().split(',').map(eq => eq.trim()); // Split and clean input
+            const x_min = $("#x_min").val();
+            const x_max = $("#x_max").val();
+
+            // Send data to Flask
+            $.ajax({
+                url: "/update_graph",
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify({
+                    equations: equations,
+                    x_min: x_min,
+                    x_max: x_max
+                }),
+                success: function (response) {
+                    const graphData = JSON.parse(response);
+                    Plotly.newPlot("graph", graphData.data, graphData.layout);
+                },
+                error: function (error) {
+                    console.error("Error updating graph:", error);
+                }
+            });
+        }
+
+        // Attach event listeners to input fields
+        $(document).ready(function () {
+            $("#equations, #x_min, #x_max").on("input", function () {
+                updateGraph();
+            });
+
+            // Trigger graph update on page load
+            updateGraph();
+        });
+    </script>
+</body>
+</html>
+
